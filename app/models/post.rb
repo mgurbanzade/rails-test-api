@@ -10,6 +10,13 @@ class Post < ApplicationRecord
       .sort_by(&:average_rating)
   end
 
+  def self.ip_list
+    list = Post.select(:author_ip).group(:author_ip).having("COUNT(author_ip) > 1")
+            .map { |p| p.author_ip.to_s }.to_a
+
+    list.map { |ip| { ip => Post.where(author_ip: ip).collect(&:author).collect(&:login)} }
+  end
+
   def average_rating
     votes = self.reload.votes.map { |v| v.value }
     (votes.sum / votes.size.to_f).round(1)

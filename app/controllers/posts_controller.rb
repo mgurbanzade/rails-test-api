@@ -34,6 +34,10 @@ class PostsController < ApplicationController
     render json: required_fields
   end
 
+  def ip_list
+    render json: Post.ip_list
+  end
+
   private
 
   def post_params
