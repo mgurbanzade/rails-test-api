@@ -26,6 +26,14 @@ class PostsController < ApplicationController
     end
   end
 
+  def most_rated
+    @posts = Post.top_posts.reverse
+    options = {fields: { post: [:title, :body] }}
+    attributes = PostSerializer.new(@posts, options).serializable_hash
+    required_fields = attributes[:data].map { |p| p[:attributes] }
+    render json: required_fields
+  end
+
   private
 
   def post_params
