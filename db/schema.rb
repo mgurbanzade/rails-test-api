@@ -18,11 +18,12 @@ ActiveRecord::Schema.define(version: 2019_01_29_124300) do
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.text "body"
-    t.inet "author_ip"
+    t.string "author_ip"
     t.integer "author_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_posts_on_author_id"
+    t.index ["author_ip"], name: "index_posts_on_author_ip"
   end
 
   create_table "users", force: :cascade do |t|

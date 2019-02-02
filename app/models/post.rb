@@ -6,8 +6,8 @@ class Post < ApplicationRecord
 
   def self.top_posts
     Post.joins(:votes)
-        .select("posts.*, AVG(votes.value) AS average_ratings")
-        .group("posts.id")
+        .select('posts.*, AVG(votes.value) AS average_ratings')
+        .group('posts.id')
         .order('average_ratings DESC')
   end
 
@@ -18,7 +18,7 @@ class Post < ApplicationRecord
                                      .having("COUNT(author_ip) > 1"))
 
     users = User.all.collect(&:login)
-    duplicates = list.map { |p| { p.author_ip.to_s => users.select { |u| u == p.author.login } } }
+    duplicates = list.map { |p| { p.author_ip => users.select { |u| u == p.author.login } } }
 
     duplicates.flat_map(&:entries)
               .group_by(&:first)
