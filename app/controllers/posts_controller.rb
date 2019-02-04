@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   def create
-    request_ip = !params[:author_ip].present? ? request.remote_ip : params[:author_ip]
+    request_ip = request.remote_ip
     location = Location.find_by(ip: request_ip)
     location = Location.create(ip: request_ip) unless location.present?
 
@@ -31,6 +31,6 @@ class PostsController < ApplicationController
   private
 
   def post_params
-    params.require(:post).permit(:title, :body, :author_ip)
+    params.require(:post).permit(:title, :body)
   end
 end
