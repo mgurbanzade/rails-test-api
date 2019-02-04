@@ -10,20 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_29_124300) do
+ActiveRecord::Schema.define(version: 2019_02_03_110128) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "locations", force: :cascade do |t|
+    t.string "ip"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.text "body"
-    t.string "author_ip"
+    t.float "average_rating"
     t.integer "author_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "location_id"
     t.index ["author_id"], name: "index_posts_on_author_id"
-    t.index ["author_ip"], name: "index_posts_on_author_ip"
+    t.index ["average_rating"], name: "index_posts_on_average_rating"
+    t.index ["location_id"], name: "index_posts_on_location_id"
   end
 
   create_table "users", force: :cascade do |t|

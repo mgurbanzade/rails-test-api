@@ -1,8 +1,10 @@
-ips = []
+locations = []
 
-51.times do
-  ips << Faker::Internet.ip_v4_address
+50.times do
+  locations << Location.new(ip: Faker::Internet.ip_v4_address)
 end
+
+Location.import locations
 
 users = []
 
@@ -16,14 +18,14 @@ posts = []
 
 300000.times do |p|
   posts << Post.new(
-                    title: "sample-title-#{p}",
-                    body: "sample-body-#{p}",
+                    title: Faker::Name.name,
+                    body: Faker::Lorem.paragraph,
                     author_id: rand(1..100),
-                    author_ip: ips[rand(0..50)]
+                    location_id: rand(1..50)
                    )
 end
 
-Post.import posts, batch_size: 10
+Post.import posts, batch_size: 30
 
 votes = []
 
@@ -33,4 +35,4 @@ votes = []
   votes << Vote.new(value: rand(1..5), post_id: v)
 end
 
-Vote.import votes, batch_size: 10
+Vote.import votes, batch_size: 15

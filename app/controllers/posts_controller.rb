@@ -1,41 +1,31 @@
 class PostsController < ApplicationController
   def create
-    @post = Post.new(post_params)
-    @post.author_ip = request.remote_ip
-    @user = User.find_by(login: params[:author_login])
+    request_ip = !params[:author_ip].present? ? request.remote_ip : params[:author_ip]
+    location = Location.find_by(ip: request_ip)
+    location = Location.create(ip: request_ip) unless location.present?
 
-    unless @user.present?
-      @user = User.create(login: params[:author_login])
-    end
+    post = Post.new(post_params)
+    user = User.find_by(login: params[:author_login])
+    user = User.create(login: params[:author_login]) unless user.present?
 
-    @post.author = @user
-    @post.save
+    post.author = user
+    post.location = location
+    post.save
 
-    return render json: PostSerializer.new(@post) if @post.save
-    render json: @post.errors.full_messages, status: 422
+    return render json: PostSerializer.new(post) if post.save
+    render json: post.errors.full_messages, status: 422
   end
 
   def rate
-    @post = Post.find(params[:id])
-    @vote = @post.votes.create(value: params[:vote])
+    post = Post.find(params[:id])
+    vote = post.votes.create(value: params[:vote])
 
-    if @vote.errors.present?
-      render json: @vote.errors.full_messages, status: 422
-    else
-      render json: {rating: @post.average_rating}
-    end
+    return render json: {rating: post.average_rating} unless vote.errors.present?
+    render json: vote.errors.full_messages, status: 422
   end
 
   def most_rated
-    @posts = Post.top_posts.reverse
-    options = {fields: { post: [:title, :body] }}
-    attributes = PostSerializer.new(@posts, options).serializable_hash
-    required_fields = attributes[:data].map { |p| p[:attributes] }
-    render json: required_fields
-  end
-
-  def ip_list
-    render json: Post.ip_list
+    paginate json: Post.top_posts
   end
 
   private
