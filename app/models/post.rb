@@ -5,7 +5,7 @@ class Post < ApplicationRecord
 
   paginates_per 15
 
-  validates_presence_of :title, :body
+  validates_presence_of :title, :body, :location_id
 
   def self.top_posts
     Post.where.not(average_rating: nil)

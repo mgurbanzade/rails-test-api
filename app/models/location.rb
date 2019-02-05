@@ -4,6 +4,8 @@ class Location < ApplicationRecord
 
   paginates_per 15
 
+  validates_presence_of :ip
+
   def self.ip_list
     Location.joins(:users)
             .select(:id, :ip)
