@@ -1,38 +1,26 @@
-locations = []
+# frozen_string_literal: true
 
-50.times do
-  locations << Location.new(ip: Faker::Internet.ip_v4_address)
+locations = (1..50).map { [Faker::Internet.ip_v4_address] }
+Location.import [:ip], locations, validate: false
+
+users = (1..100).map { |u| ["user_#{u}"] }
+User.import [:login], users, validate: false
+
+post_columns = %i[title body author_id location_id]
+post_values = (1..300000).map do
+  [
+    Faker::Name.name,
+    Faker::Lorem.paragraph,
+    rand(1..100),
+    rand(1..50)
+  ]
 end
 
-Location.import locations
+Post.import post_columns, post_values, recursive: true, validate: false
 
-users = []
+vote_columns = %i[value post_id]
+vote_values = (1..150000).map { |v| [rand(1..5), v] }
 
-100.times do |u|
-  users << User.new(login: "user_#{u}")
-end
+Vote.import vote_columns, vote_values, recursive: true, validate: false
 
-User.import users
-
-posts = []
-
-300000.times do |p|
-  posts << Post.new(
-                    title: Faker::Name.name,
-                    body: Faker::Lorem.paragraph,
-                    author_id: rand(1..100),
-                    location_id: rand(1..50)
-                   )
-end
-
-Post.import posts, batch_size: 30
-
-votes = []
-
-150000.times do |v|
-  votes << Vote.new(value: rand(1..5), post_id: v)
-  votes << Vote.new(value: rand(1..5), post_id: v)
-  votes << Vote.new(value: rand(1..5), post_id: v)
-end
-
-Vote.import votes, batch_size: 15
+ActiveRecord::Base.connection.execute("UPDATE posts SET average_rating = (SELECT AVG(votes.value) AS aver FROM votes WHERE votes.post_id = posts.id)")

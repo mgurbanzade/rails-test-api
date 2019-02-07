@@ -11,7 +11,5 @@ class Location < ApplicationRecord
             .select(:id, :ip)
             .group(:id, :ip)
             .having('count(users) > 1')
-            .order(id: :asc)
-            .preload(:users)
   end
 end
