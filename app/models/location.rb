@@ -7,4 +7,10 @@ class Location < ApplicationRecord
   scope :with_offset, -> (offset, limit = 15) {
     select(:id, :ip).group(:id, :ip).offset(offset).limit(limit)
   }
+
+  def self.cache_key(locations)
+    {
+      stat_record: locations.maximum(:updated_at)
+    }
+  end
 end
