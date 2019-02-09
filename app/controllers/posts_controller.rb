@@ -4,11 +4,8 @@ class PostsController < ApplicationController
   end
 
   def rate
-    post = Post.find(params[:id])
-    vote = post.votes.create(value: params[:vote])
-
-    return render json: {rating: post.average_rating} unless vote.errors.present?
-    render json: vote.errors.full_messages, status: 422
+    response = PostRatingService.new(params).call
+    render json: response[:body], status: response[:status]
   end
 
   def most_rated
