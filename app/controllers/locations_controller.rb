@@ -1,8 +1,13 @@
 class LocationsController < ApplicationController
   def index
     page = params[:page].nil? ? 1 : params[:page].to_i
-    locations = Location.ip_list.offset(page * 15 - 15).limit(15)
-    locations = locations.map { |l| { l.ip => l.users.pluck(:login) } }
-    render json: locations.to_json
+    locations = Location.with_offset(page * 15 - 15)
+    response = locations.includes(:users).map do |l|
+      {
+        l.ip => l.users.pluck(:login).uniq
+      }
+    end
+
+    render json: response.to_json
   end
 end
