@@ -10,21 +10,21 @@ class PostCreationService
   def call
     location = Location.find_by(ip: ip)
     location = Location.new(ip: ip) unless location.present?
-    return location.errors.full_messages unless location.valid?
+    return {body: location.errors.full_messages, status: 422} unless location.valid?
 
     user = User.find_by(login: params[:author_login])
     user = User.new(login: params[:author_login]) unless user.present?
-    return user.errors.full_messages unless user.valid?
+    return {body: user.errors.full_messages, status: 422} unless user.valid?
 
     post = Post.new(post_params)
     post.author = user
     post.location = location
-    return post.errors.full_messages unless post.valid?
+    return {body: post.errors.full_messages, status: 422} unless post.valid?
 
     location.save
     user.save
     post.save
 
-    PostSerializer.new(post)
+    {body: PostSerializer.new(post), status: 200}
   end
 end
