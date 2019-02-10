@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   def create
-    render json: PostCreationService.new(post_params, params, request.remote_ip).call
+    response = PostCreationService.new(post_params, params, request.remote_ip).call
+    render json: response[:body], status: response[:status]
   end
 
   def rate

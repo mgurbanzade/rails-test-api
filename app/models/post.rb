@@ -5,7 +5,7 @@ class Post < ApplicationRecord
 
   paginates_per 15
 
-  validates_presence_of :title, :body, :location_id
+  validates_presence_of :title, :body
 
   after_touch :save
   after_save :create_json_cache
@@ -22,6 +22,6 @@ class Post < ApplicationRecord
   private
 
   def create_json_cache
-    CreateLocationsJsonCacheJob.perform_later
+    CreateLocationsJsonCacheJob.perform_later unless Rails.env.test?
   end
 end
