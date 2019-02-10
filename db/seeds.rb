@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-locations = (1..50).map { [Faker::Internet.ip_v4_address] }
+locations = Parallel.map(1..50) { [Faker::Internet.ip_v4_address] }
 Location.import [:ip], locations, validate: false
 
-users = (1..100).map { |u| ["user_#{u}"] }
+users = Parallel.map(1..100) { |u| ["user_#{u}"] }
 User.import [:login], users, validate: false
 
 post_columns = %i[title body author_id location_id]
-post_values = (1..300000).map do
+post_values = Parallel.map(1..300000) do
   [
     Faker::Name.name,
     Faker::Lorem.paragraph,
@@ -19,7 +19,7 @@ end
 Post.import post_columns, post_values, recursive: true, validate: false
 
 vote_columns = %i[value post_id]
-vote_values = (1..150000).map { |v| [rand(1..5), v] }
+vote_values = Parallel.map(1..150000) { |v| [rand(1..5), v] }
 
 Vote.import vote_columns, vote_values, recursive: true, validate: false
 

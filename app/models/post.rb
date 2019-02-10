@@ -10,10 +10,9 @@ class Post < ApplicationRecord
   after_touch :save
   after_save :create_json_cache
 
-  def self.top_posts
-    Post.where.not(average_rating: nil)
-              .order('average_rating DESC')
-  end
+  scope :top_posts, -> {
+    where.not(average_rating: nil).order('average_rating DESC')
+  }
 
   def update_average
     new_average = self.votes.sum(:value) / self.votes.size.to_f
